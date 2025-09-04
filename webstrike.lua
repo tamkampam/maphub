@@ -2,7 +2,7 @@ local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
 
 local player = Players.LocalPlayer
-local teleportSpeed = 0.4 -- Işınlama hızı (saniye)
+local teleportSpeed = 0.4
 local loopEnabled = true
 
 local function getValidTokens()
@@ -10,7 +10,6 @@ local function getValidTokens()
     local tokensFolder = workspace:FindFirstChild("Tokens")
     
     if tokensFolder then
-        -- Tüm BasePart'ları al
         for _, child in ipairs(tokensFolder:GetDescendants()) do
             if child:IsA("BasePart") then
                 table.insert(tokens, child)
@@ -31,10 +30,8 @@ local function teleportPlayer()
     while loopEnabled and humanoidRootPart and humanoidRootPart.Parent do
         for _, token in ipairs(tokens) do
             if token and token.Parent then
-                -- Direkt CFrame ataması
                 humanoidRootPart.CFrame = token.CFrame
                 
-                -- Aşırı hızlı teleport için bekleme
                 if teleportSpeed > 0 then
                     wait(teleportSpeed)
                 end
@@ -43,7 +40,6 @@ local function teleportPlayer()
     end
 end
 
--- Kontrol tuşları (isteğe bağlı)
 local UIS = game:GetService("UserInputService")
 UIS.InputBegan:Connect(function(input, gameProcessed)
     if input.KeyCode == Enum.KeyCode.P then
@@ -55,5 +51,4 @@ UIS.InputBegan:Connect(function(input, gameProcessed)
     end
 end)
 
--- Başlat
 teleportPlayer()
