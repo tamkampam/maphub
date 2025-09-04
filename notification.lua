@@ -1,4 +1,4 @@
--- Script by IceMinister#9889
+-- Script by IceMinister#9889 - but with my customizations
 local LibraryName = "Notification Library" -- yes
 local NotificationLibrary = {}
 local TweenService = game:GetService("TweenService")
