@@ -83,6 +83,14 @@ function StartRaceBot()
                             if Player.Character and Player.Character:FindFirstChild("HumanoidRootPart") then
                                 Player.Character.HumanoidRootPart.CFrame = playerCar.DriveSeat.CFrame
                                 print("BOT: Teleported to car DriveSeat")
+
+                                wait(0.1)
+                                Player.Character.HumanoidRootPart.CFrame = Player.Character.HumanoidRootPart.CFrame * CFrame.new(-1, 0, 0)
+                                print("BOT: Moved left 1 stud")
+                                
+                                wait(0.1)
+                                Player.Character.HumanoidRootPart.CFrame = Player.Character.HumanoidRootPart.CFrame * CFrame.new(1, 0, 0)
+                                print("BOT: Moved right 1 stud")
                                 
                                 wait(1)
                                 
