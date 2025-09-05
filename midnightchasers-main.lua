@@ -1,9 +1,11 @@
-local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/bloodball/-back-ups-for-libs/main/wizard"))()
-local Window = Library:NewWindow("Chasers - Main")
-local Section = Window:NewSection("Tab")
+local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/bloodball/-back-ups-for-libs/main/Revenant", true))()
+local Flags = Library.Flags
+
+local Window = Library:Window({
+   Text = "MainTab"
+})
 
 local teleporting = false
-local UIS = game:GetService("UserInputService")
 local VIM = game:GetService("VirtualInputManager")
 
 local checkpoints = {}
@@ -30,26 +32,30 @@ local function holdKey(key, duration)
     VIM:SendKeyEvent(false, key, false, nil)
 end
 
-Section:CreateToggle("Auto Teleport", function(value)
-    teleporting = value
-    if value then
-        teleportCar(CFrame.new(3260, -15, 1015))
-        wait(15)
-        
-        while teleporting do
-            for i = 1, 41 do
-                if not teleporting then break end
-                teleportCar(checkpoints[i].CFrame)
-                holdKey(Enum.KeyCode.W, 1.75)
-            end
+local Toggle = Window:Toggle({
+   Text = "AutoTp",
+   Flag = "AutoTpFlag",
+   Callback = function(bool)
+        teleporting = bool
+        if bool then
+            teleportCar(CFrame.new(3260, -15, 1015))
+            wait(15)
             
-            if teleporting then
-                holdKey(Enum.KeyCode.Space, 5)
-                teleportCar(CFrame.new(3260, -15, 1015))
-                wait(15)
-                pressKey(Enum.KeyCode.Space)
-                wait(0.5)
+            while teleporting do
+                for i = 1, 41 do
+                    if not teleporting then break end
+                    teleportCar(checkpoints[i].CFrame)
+                    holdKey(Enum.KeyCode.W, 1.75)
+                end
+                
+                if teleporting then
+                    holdKey(Enum.KeyCode.Space, 5)
+                    teleportCar(CFrame.new(3260, -15, 1015))
+                    wait(15)
+                    pressKey(Enum.KeyCode.Space)
+                    wait(0.5)
+                end
             end
         end
-    end
-end)
+   end
+})
