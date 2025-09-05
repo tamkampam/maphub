@@ -32,32 +32,22 @@ function ensureCarTeleport()
     
     while not isCarAtTargetPosition() and attempts < maxAttempts and Enabled do
         attempts += 1
-        print("BOT: Teleport failed, retrying attempt " .. attempts .. "...")
+        print("BOT: Teleport failed, retrying attempt " .. attempts)
         teleportCar(targetCFrame)
         wait(1)
     end
     
-    if isCarAtTargetPosition() then
-        print("BOT: Car successfully teleported to target position")
-        return true
-    else
-        print("BOT: ERROR - Failed to teleport car after " .. attempts .. " attempts")
-        return false
-    end
+    return isCarAtTargetPosition()
 end
 
 function StartRaceBot()
     spawn(function()
         print("BOT: Starting race bot...")
-        print("BOT: Player: " .. Player.Name)
-        print("BOT: Car name: " .. CarName)
-        print("BOT: Target position: " .. tostring(targetPosition))
         
         while Enabled do
             local playerNearby = false
             
             local players = game:GetService("Players"):GetPlayers()
-            print("BOT: Checking " .. #players .. " players near target position")
             
             for _, otherPlayer in pairs(players) do
                 if otherPlayer ~= Player and otherPlayer.Character then
@@ -66,11 +56,9 @@ function StartRaceBot()
                         local playerPosition = humanoidRootPart.Position
                         local distanceToTarget = (playerPosition - targetPosition).Magnitude
                         
-                        print("BOT: " .. otherPlayer.Name .. " - Distance to target: " .. math.floor(distanceToTarget) .. " studs")
-                        
                         if distanceToTarget <= 20 then
                             playerNearby = true
-                            print("BOT: Player detected near target: " .. otherPlayer.Name .. " (" .. math.floor(distanceToTarget) .. " studs from target)")
+                            print("BOT: Player detected near target: " .. otherPlayer.Name)
                             break
                         end
                     end
@@ -78,19 +66,17 @@ function StartRaceBot()
             end
             
             if playerNearby and Enabled then
-                print("BOT: Player detected near target position, teleporting car...")
+                print("BOT: Teleporting car to target...")
                 
                 if ensureCarTeleport() then
-                    print("BOT: Waiting 25 seconds...")
+                    print("BOT: Waiting 25 seconds")
                     wait(25)
                     
                     if Enabled then
-                        print("BOT: Sending F key...")
                         game:GetService("VirtualInputManager"):SendKeyEvent(true, Enum.KeyCode.F, false, game)
                         game:GetService("VirtualInputManager"):SendKeyEvent(false, Enum.KeyCode.F, false, game)
                         print("BOT: F key pressed")
                         
-                        print("BOT: Waiting 5 seconds...")
                         wait(5)
                         
                         if Enabled and playerCar and playerCar:FindFirstChild("DriveSeat") then
@@ -98,27 +84,20 @@ function StartRaceBot()
                                 Player.Character.HumanoidRootPart.CFrame = playerCar.DriveSeat.CFrame
                                 print("BOT: Teleported to car DriveSeat")
                                 
-                                print("BOT: Waiting 1 second...")
                                 wait(1)
                                 
-                                print("BOT: Teleporting back to target position...")
+                                print("BOT: Teleporting back to target")
                                 ensureCarTeleport()
-                            else
-                                print("BOT: ERROR - Character or HumanoidRootPart not found for teleport")
                             end
-                        else
-                            print("BOT: ERROR - Car or DriveSeat not found")
                         end
                     end
                 end
             else
-                print("BOT: No players detected near target position, checking again in 0.5 seconds...")
                 wait(0.5)
             end
         end
     end)
 end
 
-print("BOT: Script loaded successfully! Starting automatically...")
-print("BOT: Enabled: " .. tostring(Enabled))
+print("BOT: Script loaded successfully!")
 StartRaceBot()
