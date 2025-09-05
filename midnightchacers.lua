@@ -52,7 +52,8 @@ function ensureCarTeleport(targetCFrame, targetPosition)
 end
 
 function checkPlayersNearTarget()
-    local playersNearTarget = false
+    local playersNear40Stud = false
+    local playersNear20Stud = false
     local currentTime = tick()
     
     local players = game:GetService("Players"):GetPlayers()
@@ -64,19 +65,50 @@ function checkPlayersNearTarget()
                 local playerPosition = humanoidRootPart.Position
                 local distanceToTarget = (playerPosition - targetPosition1).Magnitude
                 
-                if distanceToTarget <= 20 then
-                    playersNearTarget = true
+                if distanceToTarget <= 40 and not playersNear40Stud then
+                    playersNear40Stud = true
                     if currentTime - lastPrintTime >= printCooldown then
-                        print("BOT: Player detected near target: " .. otherPlayer.Name .. " (" .. math.floor(distanceToTarget) .. " studs from target)")
+                        print("BOT: Player detected within 40 studs: " .. otherPlayer.Name .. " (" .. math.floor(distanceToTarget) .. " studs)")
                         lastPrintTime = currentTime
                     end
-                    break
+                end
+                
+                if distanceToTarget <= 20 and not playersNear20Stud then
+                    playersNear20Stud = true
+                    if currentTime - lastPrintTime >= printCooldown then
+                        print("BOT: Player detected within 20 studs: " .. otherPlayer.Name .. " (" .. math.floor(distanceToTarget) .. " studs)")
+                        lastPrintTime = currentTime
+                    end
                 end
             end
         end
     end
     
-    return playersNearTarget
+    return playersNear40Stud, playersNear20Stud
+end
+
+function performKeyActions()
+    print("BOT: Starting key sequence...")
+    
+    print("BOT: Pressing SPACE key once...")
+    game:GetService("VirtualInputManager"):SendKeyEvent(true, Enum.KeyCode.Space, false, game)
+    game:GetService("VirtualInputManager"):SendKeyEvent(false, Enum.KeyCode.Space, false, game)
+    wait(0.1)
+    
+    print("BOT: Holding S key for 2 seconds...")
+    game:GetService("VirtualInputManager"):SendKeyEvent(true, Enum.KeyCode.S, false, game)
+    wait(2)
+    game:GetService("VirtualInputManager"):SendKeyEvent(false, Enum.KeyCode.S, false, game)
+    print("BOT: S key released")
+    wait(0.1)
+    
+    print("BOT: Holding SPACE key for 3.5 seconds...")
+    game:GetService("VirtualInputManager"):SendKeyEvent(true, Enum.KeyCode.Space, false, game)
+    wait(3.5)
+    game:GetService("VirtualInputManager"):SendKeyEvent(false, Enum.KeyCode.Space, false, game)
+    print("BOT: SPACE key released")
+    
+    print("BOT: Key sequence completed")
 end
 
 function StartRaceBot()
@@ -90,14 +122,14 @@ function StartRaceBot()
         ensureCarTeleport(targetCFrame2, targetPosition2)
         
         while Enabled do
-            local playersNearTarget = checkPlayersNearTarget()
+            local playersNear40Stud, playersNear20Stud = checkPlayersNearTarget()
             
-            if playersNearTarget and Enabled then
-                print("BOT: Player detected near primary target, teleporting to position 1...")
+            if playersNear40Stud and Enabled then
+                print("BOT: Player detected within 40 studs, teleporting to position 1...")
+                ensureCarTeleport(targetCFrame1, targetPosition1)
                 
-                if ensureCarTeleport(targetCFrame1, targetPosition1) then
-                    print("BOT: Starting 40-second process...")
-                    
+                if playersNear20Stud then
+                    print("BOT: Player within 20 studs detected, starting 25-second process...")
                     wait(25)
                     
                     if Enabled then
@@ -105,28 +137,23 @@ function StartRaceBot()
                         game:GetService("VirtualInputManager"):SendKeyEvent(true, Enum.KeyCode.F, false, game)
                         game:GetService("VirtualInputManager"):SendKeyEvent(false, Enum.KeyCode.F, false, game)
                         
+                        print("BOT: Waiting 5 seconds...")
                         wait(5)
                         
                         if Enabled and playerCar and playerCar:FindFirstChild("DriveSeat") then
                             if Player.Character and Player.Character:FindFirstChild("HumanoidRootPart") then
                                 Player.Character.HumanoidRootPart.CFrame = playerCar.DriveSeat.CFrame
+                                print("BOT: Teleported to car DriveSeat")
 
                                 wait(0.1)
                                 Player.Character.HumanoidRootPart.CFrame = Player.Character.HumanoidRootPart.CFrame * CFrame.new(-1, 0, 0)
+                                print("BOT: Moved left 1 stud")
                                 
                                 wait(0.1)
                                 Player.Character.HumanoidRootPart.CFrame = Player.Character.HumanoidRootPart.CFrame * CFrame.new(1, 0, 0)
+                                print("BOT: Moved right 1 stud")
                                 
-                                game:GetService("VirtualInputManager"):SendKeyEvent(true, Enum.KeyCode.Space, false, game)
-                                game:GetService("VirtualInputManager"):SendKeyEvent(false, Enum.KeyCode.Space, false, game)
-                                
-                                game:GetService("VirtualInputManager"):SendKeyEvent(true, Enum.KeyCode.S, false, game)
-                                wait(2)
-                                game:GetService("VirtualInputManager"):SendKeyEvent(false, Enum.KeyCode.S, false, game)
-                                
-                                game:GetService("VirtualInputManager"):SendKeyEvent(true, Enum.KeyCode.Space, false, game)
-                                wait(3.5)
-                                game:GetService("VirtualInputManager"):SendKeyEvent(false, Enum.KeyCode.Space, false, game)
+                                performKeyActions()
                                 
                                 wait(1)
                                 
@@ -135,6 +162,9 @@ function StartRaceBot()
                             end
                         end
                     end
+                else
+                    print("BOT: Player within 40 studs but not within 20 studs, waiting...")
+                    wait(2)
                 end
             else
                 if not isCarAtPosition(targetPosition2) then
